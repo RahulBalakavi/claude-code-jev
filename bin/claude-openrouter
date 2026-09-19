@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+readonly task_claude_bin="${CLAUDE_OPENROUTER_BIN:-claude}"
+
+if ! command -v "${task_claude_bin}" >/dev/null 2>&1; then
+  printf '%s\n' "claude-openrouter: Claude Code is not installed" >&2
+  exit 1
+fi
+
+task_openrouter_key="${OPENROUTER_API_KEY:-}"
+readonly task_openrouter_key
+
+if [[ -z "${task_openrouter_key}" ]]; then
+  printf '%s\n' "claude-openrouter: OPENROUTER_API_KEY is required" >&2
+  exit 1
+fi
+
+export OPENROUTER_API_KEY="${task_openrouter_key}"
+export ANTHROPIC_AUTH_TOKEN="${task_openrouter_key}"
+export ANTHROPIC_API_KEY=""
+export ANTHROPIC_BASE_URL="${ANTHROPIC_BASE_URL:-https://openrouter.ai/api}"
+export CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY="${CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY:-1}"
+export CLAUDE_CONFIG_DIR="${CLAUDE_OPENROUTER_CONFIG_DIR:-${HOME}/.claude-openrouter}"
+
+exec "${task_claude_bin}" "$@"
